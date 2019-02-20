@@ -11,12 +11,14 @@ public class Users {
     private String name;
     private String teamName;
     private Long salary;
+    private String gender;
 
-    public Users(Integer id, String name, String teamName, Long salary) {
+    public Users(Integer id, String name, String teamName, Long salary, String gender) {
         this.id = id;
         this.name = name;
         this.teamName = teamName;
         this.salary = salary;
+        this.gender = gender;
     }
 
     public Integer getId() {
@@ -49,5 +51,13 @@ public class Users {
 
     public void setSalary(Long salary) {
         this.salary = salary;
+    }
+    
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }
