@@ -11,6 +11,9 @@ public class SpringBootMongodbExampleApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		System.out.println("********************");
+		System.out.println("Hi T");
+		System.out.println("********************");
 	}
 
 }
