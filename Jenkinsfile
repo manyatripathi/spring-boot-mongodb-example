@@ -102,13 +102,13 @@ node
 
    stage('Code Coverage')
    {
-	sh 'mvn report'
+	sh 'mvn package'
    }
 
-   stage('Packaging')
+   /*stage('Packaging')
    {
        sh 'mvn package'
-   }
+   }*/
 
    /*stage('Dev - Build Application')
    {
