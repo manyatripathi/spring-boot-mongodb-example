@@ -93,7 +93,7 @@ node
    /*stage('Static Code Quality Analysis')
    {
        sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
-   }
+   }*/
 
    stage('Unit Testing')
    {
@@ -102,15 +102,15 @@ node
 
    stage('Code Coverage')
    {
-
+	sh 'mvn report'
    }
 
    stage('Packaging')
    {
        sh 'mvn package'
-   }*/
+   }
 
-   stage('Dev - Build Application')
+   /*stage('Dev - Build Application')
    {
        buildApp("${APP_NAME}-dev", "${MS_NAME}")
    }
@@ -128,7 +128,7 @@ node
    stage('Test - Deploy Application')
    {
        deployApp("${APP_NAME}-test", "${MS_NAME}")
-   } 
+   } */
 
    /*stage('check')
    {
