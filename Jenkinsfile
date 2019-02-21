@@ -18,7 +18,7 @@ def firstTimeDevDeployment(projectName,msName){
             def bcExists = bcSelector.exists()
             if (!bcExists) {
                 openshift.newApp("redhat-openjdk18-openshift:1.1~${GIT_SOURCE_URL}","--strategy=source")
-                sh 'sleep 200'
+                sh 'sleep 120'
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
             } else {
