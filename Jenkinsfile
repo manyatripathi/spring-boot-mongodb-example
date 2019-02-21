@@ -31,7 +31,14 @@ def firstTimeDevDeployment(projectName,msName){
 def firstTimeTestDeployment(sourceProjectName,destinationProjectName,msName){
     openshift.withCluster() {
         openshift.withProject(destinationProjectName){
-            openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
+	    def dcSelector = openshift.selector( "dc", msName)
+            def dcExists = dcSelector.exists()
+	    if(!dcExists){
+	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
+	    }
+            else {
+                sh 'echo deployment config already exists in test env'  
+            } 
         }
     }
 }
