@@ -100,10 +100,10 @@ node
         sh 'mvn test'
    }
 
-   /*stage('Code Coverage')
+   stage('Code Coverage')
    {
 	sh 'mvn package'
-   }*/
+   }
 
    /*stage('Packaging')
    {
@@ -129,14 +129,5 @@ node
    {
        deployApp("${APP_NAME}-test", "${MS_NAME}")
    } */
-
-   /*stage('check')
-   {
-       BuildDecide(return1("${microservice}","${devproject}"))
-   }
-   stage('Jacoco')
-    {
-        sh "mvn -f cart-service/pom.xml  clean package"
-    }*/	 
-  
+ 
 }
