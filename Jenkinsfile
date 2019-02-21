@@ -62,7 +62,7 @@ def buildApp(projectName,msName){
 def deployApp(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName){
-            openshiftDeploy(deploymentConfig: msName)
+            openshiftDeploy(namespace: projectName,deploymentConfig: msName)
         }
     }
 }
