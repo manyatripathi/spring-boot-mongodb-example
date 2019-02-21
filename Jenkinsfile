@@ -95,10 +95,10 @@ node
        sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
    }*/
 
-   stage('Unit Testing')
+   /*stage('Unit Testing')
    {
         sh 'mvn test'
-   }
+   }*/
 
    stage('Code Coverage')
    {
