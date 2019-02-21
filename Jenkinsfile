@@ -21,7 +21,7 @@ def firstTimeDevDeployment(projectName,msName){
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
             } else {
-                sh 'echo build config already exists in development'  
+                sh 'echo build config already exists in development environment'  
             } 
         }
     }
@@ -36,7 +36,7 @@ def firstTimeTestDeployment(sourceProjectName,destinationProjectName,msName){
 	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
 	    }
             else {
-                sh 'echo deployment config already exists in test env'  
+                sh 'echo deployment config already exists in testing environment'  
             } 
         }
     }
@@ -45,7 +45,14 @@ def firstTimeTestDeployment(sourceProjectName,destinationProjectName,msName){
 def firstTimeProdDeployment(sourceProjectName,destinationProjectName,msName){
     openshift.withCluster() {
         openshift.withProject(destinationProjectName){
-            openshift.newApp(sourceProjectName+"/"+msName+":"+"prod")   
+	    def dcSelector = openshift.selector( "dc", msName)
+            def dcExists = dcSelector.exists()
+	    if(!dcExists){
+	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"prod")   
+	    }
+            else {
+                sh 'echo deployment config already exists in production environment'  
+            } 
         }
     }
 }
@@ -135,7 +142,7 @@ node
 	
    node('selenium')
    {
-	stage('Integration-Test')
+	stage('Integration Testing')
 	{
 	    container('jnlp')
 	    {
@@ -145,6 +152,20 @@ node
 	 }
     }
 	
+    stage('Security Testing')
+    {
+        sh 'mvn findbugs:findbugs'
+    }	
+
+    stage('Deploy to Production approval')
+    {
+       input "Deploy to Production Environment?"
+    }
+	
+    stage('Test - Deploy Application')
+    {
+       deployApp("${APP_NAME}-prod", "${MS_NAME}")
+    }	
  
 }
 }	
