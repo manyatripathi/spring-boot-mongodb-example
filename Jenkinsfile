@@ -92,7 +92,7 @@ node
         readProperties()
         firstTimeDevDeployment("${APP_NAME}-dev", "${MS_NAME}")
         firstTimeTestDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
-        //firstTimeProdDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")
+        firstTimeProdDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")
    }
    
    stage('Checkout')
@@ -157,6 +157,11 @@ node
         sh 'mvn findbugs:findbugs'
     }	
 
+    stage('Tagging Image for Testing')
+    {
+        openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'prod')
+    }	
+    
     stage('Deploy to Production approval')
     {
        input "Deploy to Production Environment?"
