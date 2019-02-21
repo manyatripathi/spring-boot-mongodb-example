@@ -67,6 +67,15 @@ def deployApp(projectName,msName){
     }
 }
 
+podTemplate(cloud:'openshift',label: 'selenium', 
+  containers: [
+    containerTemplate(
+      name: 'jnlp',
+      image: 'cloudbees/jnlp-slave-with-java-build-tools',
+      alwaysPullImage: true,
+      args: '${computer.jnlpmac} ${computer.name}'
+    )])
+{
 node 
 {
    def MAVEN_HOME = tool "MAVEN_HOME"
@@ -105,12 +114,7 @@ node
 	sh 'mvn package'
    }
 
-   /*stage('Packaging')
-   {
-       sh 'mvn package'
-   }*/
-
-   /*stage('Dev - Build Application')
+   stage('Dev - Build Application')
    {
        buildApp("${APP_NAME}-dev", "${MS_NAME}")
    }
@@ -128,6 +132,19 @@ node
    stage('Test - Deploy Application')
    {
        deployApp("${APP_NAME}-test", "${MS_NAME}")
-   } */
+   }
+	
+   node('selenium')
+   {
+	stage('Integration-Test')
+	{
+	    container('jnlp')
+	    {
+	         checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: "${GIT_SOURCE_URL}"]]])
+		 sh 'mvn integration-test'
+	    }
+	 }
+    }
+	
  
 }
