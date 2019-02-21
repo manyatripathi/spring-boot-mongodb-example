@@ -10,8 +10,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SpringBootMongodbExampleApplicationTests {
 
 	@Test
-	public void sourabh() {
-		System.out.println("HI");
+	public void checkUnitTest() {
+		System.out.println("Hello !! from unit test case");
 	}
 
 }
