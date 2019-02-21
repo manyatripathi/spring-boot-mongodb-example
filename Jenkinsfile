@@ -7,7 +7,7 @@ def readProperties()
     env.MS_NAME = property.MS_NAME
     env.BRANCH = property.BRANCH
     env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
-    env.SONAR_HOST_URL = property.SONAR_HOST_URL
+    //env.SONAR_HOST_URL = property.SONAR_HOST_URL
     
 }
 
@@ -18,7 +18,7 @@ def firstTimeDevDeployment(projectName,msName){
             def bcExists = bcSelector.exists()
             if (!bcExists) {
                 openshift.newApp("redhat-openjdk18-openshift:1.1~${GIT_SOURCE_URL}","--strategy=source")
-                
+                sh 'sleep 200'
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
             } else {
@@ -47,7 +47,7 @@ def firstTimeProdDeployment(sourceProjectName,destinationProjectName,msName){
 def buildApp(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName){
-            openshift.startBuild(msName)   
+            openshift.startBuild(msName,"--wait")   
         }
     }
 }
@@ -83,7 +83,7 @@ node
        sh 'mvn clean compile'
    }
 
-   stage('Static Code Quality Analysis')
+   /*stage('Static Code Quality Analysis')
    {
        sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
    }
@@ -101,7 +101,7 @@ node
    stage('Packaging')
    {
        sh 'mvn package'
-   }
+   }*/
 
    stage('Dev - Build Application')
    {
@@ -123,46 +123,13 @@ node
        deployApp("${APP_NAME}-test", "${MS_NAME}")
    } 
 
-   stage('check')
+   /*stage('check')
    {
        BuildDecide(return1("${microservice}","${devproject}"))
    }
    stage('Jacoco')
     {
         sh "mvn -f cart-service/pom.xml  clean package"
-    }
-
-		node('selenium'){stage('Integration-Test')
-		{
-			container('jnlp'){
-			    echo'integration-test'
-			 //sh"mvn -f cart-service/pom.xml integration-test"
-			}
-		}}
-
-			stage('Findbug')
-				{
-            
-					sh "mvn -f cart-service/pom.xml  findbugs:findbugs"
-				}
-			stage("Tagging Image for Production")
-				{	
-					script {
-						openshift.withCluster() {
-						openshift.withProject("${devproject}") {
-						openshift.tag("${templateName}:latest", "${templateName}-staging:latest") 
-					}
-				}
-			}
-		}
-		  /*stage('Deploy to Production approval')
-		  {
-             input "Deploy to prod?"
-		}
-		stage("Promote to Production")
-		{
-			BuildDecide(return1("${microservice}","${prodproject}"))
-		}*/
+    }*/	 
   
-	}
 }
