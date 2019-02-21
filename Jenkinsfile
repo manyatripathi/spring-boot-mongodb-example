@@ -1,5 +1,4 @@
-def readProperties()
-{
+def readProperties(){
 	def properties_file_path = "${workspace}" + "@script/properties.yml"
 	def property = readYaml file: properties_file_path
 
@@ -87,7 +86,7 @@ node
         firstTimeDevDeployment("${APP_NAME}-dev", "${MS_NAME}")
         firstTimeTestDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
         //firstTimeProdDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")
-    }
+   }
    
    stage('Checkout')
    {
@@ -148,3 +147,4 @@ node
 	
  
 }
+}	
