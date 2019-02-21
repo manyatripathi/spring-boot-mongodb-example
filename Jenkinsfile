@@ -167,7 +167,7 @@ node
        input "Deploy to Production Environment?"
     }
 	
-    stage('Test - Deploy Application')
+    stage('Prod - Deploy Application')
     {
        deployApp("${APP_NAME}-prod", "${MS_NAME}")
     }	
