@@ -107,7 +107,7 @@ node
    stage('First Time Deployment'){
         readProperties()
         firstTimeDevDeployment("${APP_NAME}-dev", "${MS_NAME}")
-	DatabaseDeployment("${APP_NAME}-dev", "")
+	DatabaseDeployment("${APP_NAME}-dev", "mysql")
        /* firstTimeTestDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
         firstTimeProdDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")*/
    }
