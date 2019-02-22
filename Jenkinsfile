@@ -56,6 +56,22 @@ def firstTimeProdDeployment(sourceProjectName,destinationProjectName,msName){
         }
     }
 }
+def DatabaseDeployment(projectName,msName){
+    openshift.withCluster() {
+        openshift.withProject(projectName) {
+            def bcSelector = openshift.selector( "bc", msName)
+            def bcExists = bcSelector.exists()
+            if (!bcExists) {
+                openshift.newApp("-e MYSQL_USER=admin","-e MYSQL_PASSWORD=admin","-e MYSQL_DATABASE=admin","registry.access.redhat.com/rhscl/mysql-56-rhel7")
+                sh 'sleep 120'
+                openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
+                openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
+            } else {
+                sh 'mvn flyway:migrate'  
+            } 
+        }
+    }
+}
 
 def buildApp(projectName,msName){
     openshift.withCluster() {
@@ -91,6 +107,7 @@ node
    stage('First Time Deployment'){
         readProperties()
         firstTimeDevDeployment("${APP_NAME}-dev", "${MS_NAME}")
+	 DatabaseDeployment("${APP_NAME}-dev", "${MS_NAME}")
         firstTimeTestDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
         firstTimeProdDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")
    }
