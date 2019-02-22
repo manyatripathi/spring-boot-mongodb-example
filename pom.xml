@@ -48,6 +48,29 @@
    </dependencies>
    <build>
       <plugins>
+          <plugin>            
+        <groupId>com.lazerycode.jmeter</groupId>            
+        <artifactId>jmeter-maven-plugin</artifactId>            
+        <version>1.4.1</version>            
+        <configuration>                
+          <testResultsTimestamp>false</testResultsTimestamp>                
+          <propertiesUser>                    
+            <threadCount>${performancetest.threadCount}</threadCount>                
+          </propertiesUser>                
+          <propertiesJMeter>                    
+            <jmeter.save.saveservice.thread_counts>true</jmeter.save.saveservice.thread_counts>                
+          </propertiesJMeter>            
+        </configuration>            
+        <executions>                
+          <execution>                    
+            <id>jmeter-tests</id>                    
+            <phase>verify</phase>                    
+            <goals>                    
+              <goal>jmeter</goal>                    
+            </goals>                
+          </execution>            
+        </executions>            
+      </plugin>        
          <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
