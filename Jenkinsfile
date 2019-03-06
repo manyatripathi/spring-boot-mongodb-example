@@ -7,6 +7,10 @@ def readProperties(){
     env.BRANCH = property.BRANCH
     env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
     env.SONAR_HOST_URL = property.SONAR_HOST_URL
+	for(int i =0; i<=property.envor.size(); i++)
+	{
+            firstTimeDevDeployment(property.envor[i], "${MS_NAME}")
+	}
     
 }
 
@@ -106,7 +110,7 @@ node
    
    stage('First Time Deployment'){
         readProperties()
-        firstTimeDevDeployment("${APP_NAME}-dev", "${MS_NAME}")
+        
 	DatabaseDeployment("${APP_NAME}-dev", "mysql")
        /* firstTimeTestDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
         firstTimeProdDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")*/
