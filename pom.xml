@@ -165,6 +165,12 @@
                         <artifactId>h2</artifactId>
                         <version>1.4.197</version>
                     </dependency>
+                   <dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.7.3</version>
+		</dependency>
+
                 </dependencies>
             </plugin>
       </plugins>
