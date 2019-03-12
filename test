@@ -1,12 +1,15 @@
 node{
+    stage('clone'){
+        checkout([$class: 'GitSCM', branches: [[name: "*/master"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: "https://github.com/lohitj/spring-boot-mongodb-example.git"]]])
+    }
     stage('create') {
       
         script {
+            openshift.rsync("src "+t+":/opt/app-root/src")
             openshift.withCluster() {
                 openshift.withProject(){
                     def f = openshift.selector('pods').names()
                     def t
-                    def cmd = 'db.version()'
                     for(int i=0;i<f.size();i++)
                     {
                         if(f[i].split('/')[1].matches(/mongo(.*)/))
@@ -15,9 +18,10 @@ node{
                             t = f[i].split('/')[1]
                         }
                     }
-                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo --eval '"+cmd+"'\"").out
+                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo < Data.js\"").out
                   println f 
                   println n
+                  
                 }
             }
         }
