@@ -1,0 +1,26 @@
+node{
+    stage('create') {
+      
+        script {
+            openshift.withCluster() {
+                openshift.withProject(){
+                    def f = openshift.selector('pods').names()
+                    def t
+                    def cmd = 'db.version()'
+                    for(int i=0;i<f.size();i++)
+                    {
+                        if(f[i].split('/')[1].matches(/mongo(.*)/))
+                        {
+                            println 'lohit'
+                            t = f[i].split('/')[1]
+                        }
+                    }
+                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo --eval 'db.version()'\"").out
+                  println f 
+                  println n
+                }
+            }
+        }
+      }
+    
+}
