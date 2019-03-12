@@ -15,7 +15,7 @@ node{
                             t = f[i].split('/')[1]
                         }
                     }
-                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo --eval 'db.version()'\"").out
+                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo --eval '"+cmd+"'\"").out
                   println f 
                   println n
                 }
