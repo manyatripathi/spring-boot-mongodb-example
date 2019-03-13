@@ -1,6 +1,11 @@
 print('* Database created');
 print('%DATA');
-var db = connect('127.0.0.1:27017/admin');
+connect(url, (err, db) => {
+    
+    assert.equal(null, err);
+}).catch((err) => {
+       throw err;
+    });
 db.auth('admin','admin')
 print('* Database created');
 db = db.getSiblingDB('continent')
