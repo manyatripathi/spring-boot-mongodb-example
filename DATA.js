@@ -7,7 +7,7 @@ db = db.getSiblingDB('continent')
 print('*create a database');
 
 //create the names collection and add documents to it
-db.names.insert({'name' : 'Don Draper'}).WriteResult().code;
+db.names.insert({'name' : 'Don Draper'});
 db.names.insert({'name' : 'Peter Campbell'});
 db.names.insert({'name' : 'Betty Draper'});
 
