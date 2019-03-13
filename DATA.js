@@ -66,8 +66,8 @@ while (allMadMen.hasNext()) {
 }
 
 //drop the database
-// db.dropDatabase();
+db.dropDatabase();
 
-// print('* Database dropped');
+print('* Database dropped');
  
 
