@@ -1,6 +1,6 @@
 print('* Database created');
 print('%DATA');
-var db = connect('127.0.0.1:27017/admin');
+var db = connect('127.0.0.1:27017');
 db.auth('admin','admin')	
 print('* Database created');
 db = db.getSiblingDB('continent')
@@ -10,7 +10,6 @@ print('*create a database');
 db.names.insert({'name' : 'Don Draper'});
 db.names.insert({'name' : 'Peter Campbell'});
 db.names.insert({'name' : 'Betty Draper'});
-db.names.insert(
 
 print('* Documents created');
 
