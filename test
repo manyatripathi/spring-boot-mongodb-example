@@ -20,7 +20,13 @@ node{
                     }
                     println ""
                     openshift.rsync("\"${workspace}\" "+t+":/opt/app-root/src")
-                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo < workspace/*.js\"").out
+                    def g = openshift.exec(t+" -c mongodb -- bash -c \"mongo < workspace/*.js\"")
+                   println g
+                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo < workspace/*.js\"").status
+                  if(n!=0)
+                  {
+                      currentBuild.result = 'FAILURE'
+                  }
                   println f 
                   println n
                   
