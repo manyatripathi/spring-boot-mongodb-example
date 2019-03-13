@@ -1,3 +1,4 @@
+try{
 print('* Database created');
 var db = connect('127.0.0.1:27017/admin');
 db.auth('admin','admin')
@@ -69,5 +70,8 @@ while (allMadMen.hasNext()) {
 db.dropDatabase();
 
 print('* Database dropped');
- 
+}
+catch(e){
+   throw e;
+}
 
