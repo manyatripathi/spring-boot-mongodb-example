@@ -5,7 +5,7 @@ node{
     stage('create') {
       
         script {
-            openshift.rsync("src "+t+":/opt/app-root/src")
+            
             openshift.withCluster() {
                 openshift.withProject(){
                     def f = openshift.selector('pods').names()
@@ -18,7 +18,9 @@ node{
                             t = f[i].split('/')[1]
                         }
                     }
-                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo < Data.js\"").out
+                    println ""
+                    openshift.rsync("\"${workspace}\" "+t+":/opt/app-root/src")
+                   def n = openshift.exec(t+" -c mongodb -- bash -c \"mongo < workspace/*.js\"").out
                   println f 
                   println n
                   
