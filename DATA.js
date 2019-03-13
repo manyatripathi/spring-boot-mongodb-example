@@ -10,7 +10,7 @@ print('*create a database');
 db.names.insert({'name' : 'Don Draper'});
 db.names.insert({'name' : 'Peter Campbell'});
 db.names.insert({'name' : 'Betty Draper'});
-db.names.insert({'name' : 'Joan Harris'});
+db.names.insert(
 
 print('* Documents created');
 
