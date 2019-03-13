@@ -71,7 +71,6 @@ while (allMadMen.hasNext()) {
 db.dropDatabase();
 
 print('* Database dropped');
-db.adminCommand({ 'getLog' : 'global' })
 
 
 
