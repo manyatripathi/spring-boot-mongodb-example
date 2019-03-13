@@ -1,12 +1,7 @@
 print('* Database created');
 print('%DATA');
-connect(url, (err, db) => {
-    
-    assert.equal(null, err);
-}).catch((err) => {
-       throw err;
-    });
-db.auth('admin','admin')
+var db = connect('127.0.0.1:27017/admin');
+db.auth('admin','admin')	
 print('* Database created');
 db = db.getSiblingDB('continent')
 print('*create a database');
@@ -76,6 +71,7 @@ while (allMadMen.hasNext()) {
 db.dropDatabase();
 
 print('* Database dropped');
+db.adminCommand({ 'getLog' : 'global' })
 
 
 
