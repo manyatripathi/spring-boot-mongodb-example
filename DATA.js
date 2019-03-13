@@ -67,9 +67,9 @@ print('* Documents created');
 // }
 
 //drop the database
-db.dropDatabase();
+// db.dropDatabase();
 
-print('* Database dropped');
+// print('* Database dropped');
 
 
 
