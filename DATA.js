@@ -3,7 +3,6 @@ var db = connect('127.0.0.1:27017/admin');
 db.auth('admin','admin')
 print('* Database created');
 db = db.getSiblingDB('sampledb')
-try{
 print('*create a database');
 //create the names collection and add documents to it
 db.names.insert({'name' : 'Don Draper'});
@@ -70,8 +69,6 @@ while (allMadMen.hasNext()) {
 db.dropDatabase();
 
 print('* Database dropped');
-}
-catch(e){
-   throw e;
-}
+
+
 
