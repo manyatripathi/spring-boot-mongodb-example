@@ -5,7 +5,7 @@ db.auth('admin','admin')
 print('* Database created');
 db = db.getSiblingDB('continent')
 print('*create a database');
-try{}
+
 
 //create the names collection and add documents to it
 db.names.insert({'name' : 'Don Draper'});
