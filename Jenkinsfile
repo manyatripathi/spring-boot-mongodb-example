@@ -8,10 +8,8 @@ def readProperties(){
     env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
     env.SONAR_HOST_URL = property.SONAR_HOST_URL
 	env.prod = property.prod
-	for(int i =0; i<=property.envor.size(); i++)
-	{
-            firstTimeDevDeployment(property.envor[i], "${MS_NAME}")
-	}
+	env.envor = property.envor
+	env.size = property.envor.size()
     
 }
 
@@ -110,7 +108,9 @@ node
    env.PATH="${env.PATH}:${MAVEN_HOME}/bin:${JAVA_HOME}/bin"
    
    stage('First Time Deployment'){
-        readProperties()
+	   readProperties()
+	   firstTimeDevDeployment(env.envor[env.size], "${MS_NAME}")
+        
    }
    
    stage('Checkout')
@@ -140,11 +140,13 @@ node
 
    stage('Dev - Build Application')
    {
+	   firstTimeDevDeployment(env.envor[env.size-1], "${MS_NAME}")
        buildApp("${APP_NAME}-dev", "${MS_NAME}")
    }
 
    stage('Dev - Deploy Application')
    {
+
        deployApp("${APP_NAME}-dev", "${MS_NAME}")
    }
 
@@ -155,7 +157,8 @@ node
 
    stage('Test - Deploy Application')
    {
-       deployApp("${APP_NAME}-test", "${MS_NAME}")
+	   firstTimeDevDeployment(env.envor[env.size-2], "${MS_NAME}")
+	   deployApp("${APP_NAME}-test", "${MS_NAME}")
    }
 	
    node('selenium')
@@ -182,6 +185,7 @@ node
     
     stage('Deploy to Production approval')
     {
+	    firstTimeDevDeployment(env.envor[env.size-3], "${MS_NAME}")
        input "Deploy to Production Environment?"
     }
 	
