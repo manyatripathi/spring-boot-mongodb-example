@@ -160,7 +160,9 @@ node
 	   firstTimeDevDeployment(env.envor[env.size-2], "${MS_NAME}")
 	   deployApp("${APP_NAME}-test", "${MS_NAME}")
    }
-	
+	stage('Jmeter'){
+	sh 'mvn verify'
+	}
    node('selenium')
    {
 	stage('Integration Testing')
