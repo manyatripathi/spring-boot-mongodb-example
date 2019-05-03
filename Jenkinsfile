@@ -8,7 +8,11 @@ def readProperties(){
     env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
     env.SONAR_HOST_URL = property.SONAR_HOST_URL
     env.envor = property.envor
-    env.size = property.envor.size()	
+    env.size = property.envor.size()
+    env.CODE_QUALITY = property.CODE_QUALITY
+    env.UNIT_TESTING = property.UNIT_TESTING
+    env.CODE_COVERAGE = property.CODE_COVERAGE
+    env.FUNCTIONAL_TESTING = property.FUNCTIONAL_TESTING
     
 }
 
@@ -120,20 +124,26 @@ node
    {
        sh 'mvn clean compile'
    }
-
-   stage('Code Quality Analysis')
+   if(env.CODE_QUALITY == 'True')
    {
-       sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
+   	stage('Code Quality Analysis')
+   	{
+       		sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
+   	}
    }
-
-   stage('Unit Testing')
+   if(env.UNIT_TESTING == 'True')
    {
-        sh 'mvn test'
+   	stage('Unit Testing')
+   	{
+        	sh 'mvn test'
+   	}
    }
-
-   stage('Code Coverage')
+   if(env.CODE_COVERAGE == 'True')
    {
-	sh 'mvn package'
+   	stage('Code Coverage')
+   	{
+		sh 'mvn package'
+   	}
    }
 
    stage('Dev - Build Application')
