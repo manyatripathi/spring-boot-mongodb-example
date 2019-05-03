@@ -6,3 +6,7 @@ SONAR_HOST_URL: 'http://sonar-spring-sample-app-cicd.apps.na39.openshift.opentlc
 IMAGE: 'registry.access.redhat.com/rhscl/mysql-56-rhel7'
 envor: ['dev' , 'test',prod]
 DATA_BASE: 'mysql'
+CODE_QUALITY: 'True'
+UNIT_TESTING: 'True'
+CODE_COVERAGE: 'True'
+FUNCTIONAL_TESTING: 'True'
