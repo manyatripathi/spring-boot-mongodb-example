@@ -109,7 +109,6 @@ node
    
    stage('First Time Deployment'){
 	   readProperties()
-	   firstTimeDevDeployment(env.envor[env.size], "${MS_NAME}")
         
    }
    
@@ -140,7 +139,7 @@ node
 
    stage('Dev - Build Application')
    {
-	   firstTimeDevDeployment(env.envor[env.size-1], "${MS_NAME}")
+	   firstTimeDevDeployment(env.envor[0], "${MS_NAME}")
        buildApp("${APP_NAME}-dev", "${MS_NAME}")
    }
 
@@ -157,7 +156,7 @@ node
 
    stage('Test - Deploy Application')
    {
-	   firstTimeDevDeployment(env.envor[env.size-2], "${MS_NAME}")
+	   firstTimeDevDeployment(env.envor[1], "${MS_NAME}")
 	   deployApp("${APP_NAME}-test", "${MS_NAME}")
    }
 	stage('Jmeter'){
@@ -187,7 +186,7 @@ node
     
     stage('Deploy to Production approval')
     {
-	    firstTimeDevDeployment(env.envor[env.size-3], "${MS_NAME}")
+	    firstTimeDevDeployment(env.envor[2], "${MS_NAME}")
        input "Deploy to Production Environment?"
     }
 	
