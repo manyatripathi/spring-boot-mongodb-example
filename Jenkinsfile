@@ -7,9 +7,8 @@ def readProperties(){
     env.BRANCH = property.BRANCH
     env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
     env.SONAR_HOST_URL = property.SONAR_HOST_URL
-	env.prod = property.prod
-	env.envor = property.envor
-	env.size = property.envor.size()
+    env.envor = property.envor
+    env.size = property.envor.size()	
     
 }
 
