@@ -1,4 +1,5 @@
-def readProperties(){
+def readProperties()
+{
 	def properties_file_path = "${workspace}" + "@script/properties.yml"
 	def property = readYaml file: properties_file_path
 
