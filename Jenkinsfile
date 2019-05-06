@@ -14,6 +14,7 @@ def readProperties()
     env.UNIT_TESTING = property.UNIT_TESTING
     env.CODE_COVERAGE = property.CODE_COVERAGE
     env.FUNCTIONAL_TESTING = property.FUNCTIONAL_TESTING
+    env.SECURITY_TESTING = property.SECURITY_TESTING	
     
 }
 
@@ -125,13 +126,6 @@ node
    {
        sh 'mvn clean compile'
    }
-   if(env.CODE_QUALITY == 'True')
-   {
-   	stage('Code Quality Analysis')
-   	{
-       		sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
-   	}
-   }
    if(env.UNIT_TESTING == 'True')
    {
    	stage('Unit Testing')
@@ -146,6 +140,15 @@ node
 		sh 'mvn package'
    	}
    }
+   if(env.CODE_QUALITY == 'True')
+   {
+   	stage('Code Quality Analysis')
+   	{
+       		sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
+   	}
+   }
+   
+   
 
    stage('Dev - Build Application')
    {
@@ -169,11 +172,14 @@ node
 	   firstTimeDevDeployment(env.envor[1], "${MS_NAME}")
 	   deployApp("${APP_NAME}-test", "${MS_NAME}")
    }
-	stage('Jmeter'){
+   stage('Jmeter')
+   {
 	sh 'mvn verify'
-	}
+   }
    node('selenium')
    {
+      if(env.FUNCTIONAL_TESTING == 'True')
+      {
 	stage('Integration Testing')
 	{
 	    container('jnlp')
@@ -182,12 +188,16 @@ node
 		 sh 'mvn integration-test'
 	    }
 	 }
+      }
     }
 	
-    stage('Security Testing')
-    {
-        sh 'mvn findbugs:findbugs'
-    }	
+	if(env.SECURITY_TESTING = 'True')
+	{
+   	 	stage('Security Testing')
+    		{
+        		sh 'mvn findbugs:findbugs'
+    		}	
+	}
 
     stage('Tagging Image for Testing')
     {
