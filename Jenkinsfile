@@ -29,7 +29,7 @@ def firstTimeDevDeployment(projectName,msName){
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
                 openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
             } else {
-                sh 'echo build config already exists in development environment'  
+                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
             } 
         }
     }
@@ -44,7 +44,7 @@ def firstTimeTestDeployment(sourceProjectName,destinationProjectName,msName){
 	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
 	    }
             else {
-                sh 'echo deployment config already exists in testing environment'  
+                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
             } 
         }
     }
@@ -59,7 +59,7 @@ def firstTimeProdDeployment(sourceProjectName,destinationProjectName,msName){
 	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"prod")   
 	    }
             else {
-                sh 'echo deployment config already exists in production environment'  
+                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
             } 
         }
     }
