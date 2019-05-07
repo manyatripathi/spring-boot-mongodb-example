@@ -18,48 +18,38 @@ def readProperties()
     
 }
 
-def firstTimeDevDeployment(projectName,msName){
+def devDeployment(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName) {
-            def bcSelector = openshift.selector( "bc", msName)
-            def bcExists = bcSelector.exists()
-            if (!bcExists) {
-                openshift.newApp("redhat-openjdk18-openshift:1.1~${GIT_SOURCE_URL}","--strategy=source")
-                sh 'sleep 120'
-                openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
-                openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
-            } else {
-                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
-            } 
-        }
+            openshiftDeploy(namespace: projectName,deploymentConfig: msName)
+        } 
     }
 }
 
-def firstTimeTestDeployment(sourceProjectName,destinationProjectName,msName){
+def testDeployment(sourceProjectName,destinationProjectName,msName){
     openshift.withCluster() {
         openshift.withProject(destinationProjectName){
-	    def dcSelector = openshift.selector( "dc", msName)
+	          def dcSelector = openshift.selector( "dc", msName)
             def dcExists = dcSelector.exists()
-	    if(!dcExists){
-	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
-	    }
+	          if(!dcExists){
+	    	      openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
+	          }
             else {
                 openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
             } 
         }
     }
 }
-
-def firstTimeProdDeployment(sourceProjectName,destinationProjectName,msName){
+def prodDeployment(sourceProjectName,destinationProjectName,msName){
     openshift.withCluster() {
         openshift.withProject(destinationProjectName){
-	    def dcSelector = openshift.selector( "dc", msName)
+	          def dcSelector = openshift.selector( "dc", msName)
             def dcExists = dcSelector.exists()
-	    if(!dcExists){
-	    	openshift.newApp(sourceProjectName+"/"+msName+":"+"prod")   
-	    }
+	          if(!dcExists){
+	    	        openshift.newApp(sourceProjectName+"/"+msName+":"+"prod")   
+	          }
             else {
-                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
+                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName)
             } 
         }
     }
@@ -84,7 +74,20 @@ def DatabaseDeployment(projectName,msName){
 def buildApp(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName){
-            openshift.startBuild(msName,"--wait")   
+            def bcSelector = openshift.selector( "bc", msName)
+            def bcExists = bcSelector.exists()
+	          if(!bcExists){
+	    	        openshift.newApp("redhat-openjdk18-openshift:1.1~${GIT_SOURCE_URL}","--strategy=source")
+                def rm = openshift.selector("dc", msName).rollout()
+                timeout(15) { 
+                  openshift.selector("dc", msName).related('pods').untilEach(1) {
+                    return (it.object().status.phase == "Running")
+                  }
+                }  
+	          }
+            else {
+                openshift.startBuild(msName,"--wait")  
+            }    
         }
     }
 }
@@ -152,14 +155,13 @@ node
 
    stage('Dev - Build Application')
    {
-	   firstTimeDevDeployment(env.envor[0], "${MS_NAME}")
        buildApp("${APP_NAME}-dev", "${MS_NAME}")
    }
 
    stage('Dev - Deploy Application')
    {
 
-       deployApp("${APP_NAME}-dev", "${MS_NAME}")
+       devDeployment("${APP_NAME}-dev", "${MS_NAME}")
    }
 
    stage('Tagging Image for Testing')
@@ -169,8 +171,7 @@ node
 
    stage('Test - Deploy Application')
    {
-	   firstTimeDevDeployment(env.envor[1], "${MS_NAME}")
-	   deployApp("${APP_NAME}-test", "${MS_NAME}")
+	   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
    }
    stage('Jmeter')
    {
@@ -206,13 +207,12 @@ node
     
     stage('Deploy to Production approval')
     {
-	    firstTimeDevDeployment(env.envor[2], "${MS_NAME}")
-       input "Deploy to Production Environment?"
+	    input "Deploy to Production Environment?"
     }
 	
     stage('Prod - Deploy Application')
     {
-       deployApp("${prod}", "${MS_NAME}")
+       prodDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")
     }	
  
 }
