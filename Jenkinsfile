@@ -1,20 +1,19 @@
 def readProperties()
 {
+
 	def properties_file_path = "${workspace}" + "@script/properties.yml"
 	def property = readYaml file: properties_file_path
-
-    env.APP_NAME = property.APP_NAME
-    env.MS_NAME = property.MS_NAME
-    env.BRANCH = property.BRANCH
-    env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
-    env.SONAR_HOST_URL = property.SONAR_HOST_URL
-    env.envor = property.envor
-    env.size = property.envor.size()
-    env.CODE_QUALITY = property.CODE_QUALITY
-    env.UNIT_TESTING = property.UNIT_TESTING
-    env.CODE_COVERAGE = property.CODE_COVERAGE
-    env.FUNCTIONAL_TESTING = property.FUNCTIONAL_TESTING
-    env.SECURITY_TESTING = property.SECURITY_TESTING	
+	env.APP_NAME = property.APP_NAME
+        env.MS_NAME = property.MS_NAME
+        env.BRANCH = property.BRANCH
+        env.GIT_SOURCE_URL = property.GIT_SOURCE_URL
+	env.GIT_CREDENTIALS = property.GIT_CREDENTIALS
+        env.SONAR_HOST_URL = property.SONAR_HOST_URL
+        env.CODE_QUALITY = property.CODE_QUALITY
+        env.UNIT_TESTING = property.UNIT_TESTING
+        env.CODE_COVERAGE = property.CODE_COVERAGE
+        env.FUNCTIONAL_TESTING = property.FUNCTIONAL_TESTING
+        env.SECURITY_TESTING = property.SECURITY_TESTING	
     
 }
 
@@ -54,7 +53,7 @@ def prodDeployment(sourceProjectName,destinationProjectName,msName){
         }
     }
 }
-def DatabaseDeployment(projectName,msName){
+/*def DatabaseDeployment(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName) {
             def bcSelector = openshift.selector( "bc", msName)
@@ -69,7 +68,7 @@ def DatabaseDeployment(projectName,msName){
             } 
         }
     }
-}
+}*/
 
 def buildApp(projectName,msName){
     openshift.withCluster() {
@@ -114,14 +113,9 @@ node
    def MAVEN_HOME = tool "MAVEN_HOME"
    def JAVA_HOME = tool "JAVA_HOME"
    env.PATH="${env.PATH}:${MAVEN_HOME}/bin:${JAVA_HOME}/bin"
-   
-   stage('First Time Deployment'){
-	   readProperties()
-        
-   }
-   
    stage('Checkout')
    {
+       readProperties()
        checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: "${GIT_SOURCE_URL}"]]])
    }
 
@@ -173,10 +167,10 @@ node
    {
 	   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
    }
-   stage('Jmeter')
+   /*stage('Jmeter')
    {
 	sh 'mvn verify'
-   }
+   }*/
    node('selenium')
    {
       if(env.FUNCTIONAL_TESTING == 'True')
@@ -200,7 +194,7 @@ node
     		}	
 	}
 
-    stage('Tagging Image for Testing')
+    stage('Tagging Image for Production')
     {
         openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'prod')
     }	
