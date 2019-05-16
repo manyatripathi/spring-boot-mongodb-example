@@ -186,7 +186,7 @@ node
       }
     }
 	
-	if(env.SECURITY_TESTING = 'True')
+	if(env.SECURITY_TESTING == 'True')
 	{
    	 	stage('Security Testing')
     		{
