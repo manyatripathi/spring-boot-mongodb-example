@@ -13,7 +13,8 @@ def readProperties()
         env.UNIT_TESTING = property.UNIT_TESTING
         env.CODE_COVERAGE = property.CODE_COVERAGE
         env.FUNCTIONAL_TESTING = property.FUNCTIONAL_TESTING
-        env.SECURITY_TESTING = property.SECURITY_TESTING	
+        env.SECURITY_TESTING = property.SECURITY_TESTING
+	env.PERFORMANCE_TESTING = property.PERFORMANCE_TESTING
     
 }
 
