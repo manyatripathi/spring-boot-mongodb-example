@@ -1,7 +1,7 @@
 APP_NAME: 'ms'
 MS_NAME: 'spring-boot-mongodb-example'
 BRANCH: 'master'
-GIT_SOURCE_URL: 'https://github.com/lohitj/spring-boot-mongodb-example.git'
+GIT_SOURCE_URL: 'https://github.com/manyatripathi/spring-boot-mongodb-example'
 SONAR_HOST_URL: 'http://104.43.251.38:9000'
 IMAGE: 'registry.access.redhat.com/rhscl/mysql-56-rhel7'
 DATA_BASE: 'mysql'
