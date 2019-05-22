@@ -170,7 +170,7 @@ node
    }
      if(env.PERFORMANCE_TESTING == 'True')
       {
-   		stage('Jmeter')
+   		stage('Performance Testing')
    		{
 			sh 'mvn verify'
    		}
