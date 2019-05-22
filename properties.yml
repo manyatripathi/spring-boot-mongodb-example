@@ -1,4 +1,4 @@
-APP_NAME: 'spring-sample'
+APP_NAME: 'ms'
 MS_NAME: 'spring-boot-mongodb-example'
 BRANCH: 'master'
 GIT_SOURCE_URL: 'https://github.com/lohitj/spring-boot-mongodb-example.git'
