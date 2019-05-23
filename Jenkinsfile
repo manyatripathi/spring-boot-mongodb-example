@@ -15,6 +15,7 @@ def readProperties()
         env.FUNCTIONAL_TESTING = property.FUNCTIONAL_TESTING
         env.SECURITY_TESTING = property.SECURITY_TESTING
 	env.PERFORMANCE_TESTING = property.PERFORMANCE_TESTING
+	env.TESTING = property.TESTING
     
 }
 
@@ -159,45 +160,47 @@ node
        devDeployment("${APP_NAME}-dev", "${MS_NAME}")
    }
 
-   stage('Tagging Image for Testing')
-   {
-       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'test')
-   }
+   if(env.TESTING == 'True')
+   {	
+	   stage('Tagging Image for Testing')
+	   {
+	       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'test')
+	   }
 
-   stage('Test - Deploy Application')
-   {
-	   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
-   }
-     if(env.PERFORMANCE_TESTING == 'True')
-      {
-   		stage('Performance Testing')
-   		{
-			sh 'mvn verify'
-   		}
-      }
-   node('selenium')
-   {
-      if(env.FUNCTIONAL_TESTING == 'True')
-      {
-	stage('Integration Testing')
-	{
-	    container('jnlp')
-	    {
-	         checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '${GIT_CREDENTIALS}', url: "${GIT_SOURCE_URL}"]]])
-		 sh 'mvn integration-test'
+	   stage('Test - Deploy Application')
+	   {
+		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
+	   }
+	     if(env.PERFORMANCE_TESTING == 'True')
+	      {
+			stage('Performance Testing')
+			{
+				sh 'mvn verify'
+			}
+	      }
+	   node('selenium')
+	   {
+	      if(env.FUNCTIONAL_TESTING == 'True')
+	      {
+		stage('Integration Testing')
+		{
+		    container('jnlp')
+		    {
+			 checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '${GIT_CREDENTIALS}', url: "${GIT_SOURCE_URL}"]]])
+			 sh 'mvn integration-test'
+		    }
+		 }
+	      }
 	    }
-	 }
-      }
-    }
-	
-	if(env.SECURITY_TESTING == 'True')
-	{
-   	 	stage('Security Testing')
-    		{
-        		sh 'mvn findbugs:findbugs'
-    		}	
-	}
 
+		if(env.SECURITY_TESTING == 'True')
+		{
+			stage('Security Testing')
+			{
+				sh 'mvn findbugs:findbugs'
+			}	
+		}
+    }
     stage('Tagging Image for Production')
     {
         openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'prod')
