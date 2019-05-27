@@ -255,7 +255,7 @@ if(env.PT == 'True')
    	}
 	stage('Test - Preprod Application')
 	 {
-		testDeployment("${APP_NAME}-uat", "${APP_NAME}-preprod", "${MS_NAME}","PRE")
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-preprod", "${MS_NAME}","PRE")
 	 }
 	     
 	
