@@ -16,6 +16,9 @@ def readProperties()
         env.SECURITY_TESTING = property.SECURITY_TESTING
 	env.PERFORMANCE_TESTING = property.PERFORMANCE_TESTING
 	env.TESTING = property.TESTING
+	env.QA = property.QA
+	env.PT = property.PT
+	
     
 }
 
@@ -27,13 +30,13 @@ def devDeployment(projectName,msName){
     }
 }
 
-def testDeployment(sourceProjectName,destinationProjectName,msName){
+def testDeployment(sourceProjectName,destinationProjectName,msName,tagName){
     openshift.withCluster() {
         openshift.withProject(destinationProjectName){
 	          def dcSelector = openshift.selector( "dc", msName)
             def dcExists = dcSelector.exists()
 	          if(!dcExists){
-	    	      openshift.newApp(sourceProjectName+"/"+msName+":"+"latest")   
+	    	      openshift.newApp(sourceProjectName+"/"+msName+":"+tagName)   
 	          }
             else {
                 openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
@@ -159,12 +162,16 @@ node
 
        devDeployment("${APP_NAME}-dev", "${MS_NAME}")
    }
-
+	
+  stage('Tagging Image for Testing')
+   {
+       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'test')
+   }
    if(env.TESTING == 'True')
    {	
 	   stage('Test - Deploy Application')
 	   {
-		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
+		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}","test")
 	   }
 	     
 	   node('selenium')
@@ -188,11 +195,12 @@ node
 			}	
 		}
     }
+	 
 if(env.QA == 'True')
    {	
 	   stage('Test - Deploy Application')
 	   {
-		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-QA", "${MS_NAME}")
+		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-QA", "${MS_NAME}","test")
 	   }
 	   node('selenium')
 	   {
@@ -214,30 +222,40 @@ if(env.QA == 'True')
 			}	
 		}
     }
+stage('Tagging Image for PT')
+   {
+       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'test', destStream: '$MS_NAME', destTag: 'PT')
+   }
 if(env.PT == 'True')
    {	
 
 	stage('Test - Deploy Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PT", "${MS_NAME}")
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PT", "${MS_NAME}","PT")
 	 }
 	     
-	stage('Performance Testing')
+	/*stage('Performance Testing')
 	{
 		sh 'mvn verify'
-	}
+	}*/
 	     
     }
 
-
+	stage('Tagging Image for UAT')
+   	{
+       		openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'PT', destStream: '$MS_NAME', destTag: 'UAT')
+   	}
 	stage('Test - UAT Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-UAT", "${MS_NAME}")
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-UAT", "${MS_NAME}","UAT")
 	 }
-
+	stage('Tagging Image for Pre-Prod')
+   	{
+       		openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'UAT', destStream: '$MS_NAME', destTag: 'PREPROD')
+   	}
 	stage('Test - Preprod Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PREPROD", "${MS_NAME}")
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PREPROD", "${MS_NAME}","PREPROD")
 	 }
 	     
 	
