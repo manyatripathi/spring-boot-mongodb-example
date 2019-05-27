@@ -200,7 +200,7 @@ if(env.QA == 'True')
    {	
 	   stage('Test - Deploy Application')
 	   {
-		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-QA", "${MS_NAME}","test")
+		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-qa", "${MS_NAME}","test")
 	   }
 	   node('selenium')
 	   {
@@ -231,7 +231,7 @@ if(env.PT == 'True')
 
 	stage('Test - Deploy Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PT", "${MS_NAME}","PT")
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-pt", "${MS_NAME}","PT")
 	 }
 	     
 	/*stage('Performance Testing')
@@ -247,7 +247,7 @@ if(env.PT == 'True')
    	}
 	stage('Test - UAT Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-UAT", "${MS_NAME}","UAT")
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-uat", "${MS_NAME}","UAT")
 	 }
 	stage('Tagging Image for Pre-Prod')
    	{
@@ -255,7 +255,7 @@ if(env.PT == 'True')
    	}
 	stage('Test - Preprod Application')
 	 {
-		testDeployment("${APP_NAME}-UAT", "${APP_NAME}-PREPROD", "${MS_NAME}","PREPROD")
+		testDeployment("${APP_NAME}-uat", "${APP_NAME}-preprod", "${MS_NAME}","PREPROD")
 	 }
 	     
 	
