@@ -33,7 +33,7 @@ def testDeployment(sourceProjectName,destinationProjectName,msName){
 	          def dcSelector = openshift.selector( "dc", msName)
             def dcExists = dcSelector.exists()
 	          if(!dcExists){
-	    	      openshift.newApp(sourceProjectName+"/"+msName+":"+"test")   
+	    	      openshift.newApp(sourceProjectName+"/"+msName+":"+"latest")   
 	          }
             else {
                 openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
@@ -162,26 +162,14 @@ node
 
    if(env.TESTING == 'True')
    {	
-	   stage('Tagging Image for Testing')
-	   {
-	       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'test')
-	   }
-
 	   stage('Test - Deploy Application')
 	   {
 		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}")
 	   }
-	     if(env.PERFORMANCE_TESTING == 'True')
-	      {
-			stage('Performance Testing')
-			{
-				sh 'mvn verify'
-			}
-	      }
+	     
 	   node('selenium')
 	   {
-	      if(env.FUNCTIONAL_TESTING == 'True')
-	      {
+	      
 		stage('Integration Testing')
 		{
 		    container('jnlp')
@@ -190,7 +178,6 @@ node
 			 sh 'mvn integration-test'
 		    }
 		 }
-	      }
 	    }
 
 		if(env.SECURITY_TESTING == 'True')
@@ -201,20 +188,59 @@ node
 			}	
 		}
     }
-    stage('Tagging Image for Production')
-    {
-        openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'prod')
-    }	
-    
-    stage('Deploy to Production approval')
-    {
-	    input "Deploy to Production Environment?"
+if(env.QA == 'True')
+   {	
+	   stage('Test - Deploy Application')
+	   {
+		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-QA", "${MS_NAME}")
+	   }
+	   node('selenium')
+	   {
+		stage('Integration Testing')
+		{
+		    container('jnlp')
+		    {
+			 checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '${GIT_CREDENTIALS}', url: "${GIT_SOURCE_URL}"]]])
+			 sh 'mvn integration-test'
+		    }
+		 }
+	    }
+
+		if(env.SECURITY_TESTING == 'True')
+		{
+			stage('Security Testing')
+			{
+				sh 'mvn findbugs:findbugs'
+			}	
+		}
     }
+if(env.PT == 'True')
+   {	
+
+	stage('Test - Deploy Application')
+	 {
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PT", "${MS_NAME}")
+	 }
+	     
+	stage('Performance Testing')
+	{
+		sh 'mvn verify'
+	}
+	     
+    }
+
+
+	stage('Test - UAT Application')
+	 {
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-UAT", "${MS_NAME}")
+	 }
+
+	stage('Test - Preprod Application')
+	 {
+		testDeployment("${APP_NAME}-dev", "${APP_NAME}-PREPROD", "${MS_NAME}")
+	 }
+	     
 	
-    stage('Prod - Deploy Application')
-    {
-       prodDeployment("${APP_NAME}-dev", "${APP_NAME}-prod", "${MS_NAME}")
-    }	
  
 }
 }	
