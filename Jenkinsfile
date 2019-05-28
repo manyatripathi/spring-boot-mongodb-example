@@ -251,11 +251,11 @@ if(env.PT == 'True')
 	 }
 	stage('Tagging Image for Pre-Prod')
    	{
-       		openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'UAT', destStream: '$MS_NAME', destTag: 'PRE')
+       		openshiftTag(namespace: '$APP_NAME-uat', srcStream: '$MS_NAME', srcTag: 'UAT', destStream: '$MS_NAME', destTag: 'PRE')
    	}
 	stage('Test - Preprod Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-preprod", "${MS_NAME}","PRE")
+		testDeployment("${APP_NAME}-uat", "${APP_NAME}-preprod", "${MS_NAME}","PRE")
 	 }
 	     
 	
