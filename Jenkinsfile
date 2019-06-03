@@ -149,6 +149,13 @@ node
        		sh 'mvn sonar:sonar -Dsonar.host.url="${SONAR_HOST_URL}"'
    	}
    }
+  if(env.SECURITY_TESTING == 'True')
+  {
+	stage('Security Testing')
+	{
+		sh 'mvn findbugs:findbugs'
+	}	
+  }
    
    
 
@@ -186,14 +193,6 @@ node
 		    }
 		 }
 	    }
-
-		if(env.SECURITY_TESTING == 'True')
-		{
-			stage('Security Testing')
-			{
-				sh 'mvn findbugs:findbugs'
-			}	
-		}
     }
 	 
 if(env.QA == 'True')
@@ -213,14 +212,6 @@ if(env.QA == 'True')
 		    }
 		 }
 	    }
-
-		if(env.SECURITY_TESTING == 'True')
-		{
-			stage('Security Testing')
-			{
-				sh 'mvn findbugs:findbugs'
-			}	
-		}
     }
 stage('Tagging Image for PT')
    {
@@ -234,10 +225,10 @@ if(env.PT == 'True')
 		testDeployment("${APP_NAME}-dev", "${APP_NAME}-pt", "${MS_NAME}","PT")
 	 }
 	     
-	/*stage('Performance Testing')
+	stage('Performance Testing')
 	{
 		sh 'mvn verify'
-	}*/
+	}
 	     
     }
 
