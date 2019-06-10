@@ -81,7 +81,7 @@ def buildApp(projectName,msName){
             def bcSelector = openshift.selector( "bc", msName)
             def bcExists = bcSelector.exists()
 	          if(!bcExists){
-	    	        openshift.newApp("redhat-openjdk18-openshift:1.1~${GIT_SOURCE_URL}","--strategy=source")
+	    	        openshift.newBuild("https://github.com/Vageesha17/projsvc","--strategy=docker")
                 def rm = openshift.selector("dc", msName).rollout()
                 timeout(15) { 
                   openshift.selector("dc", msName).related('pods').untilEach(1) {
@@ -100,6 +100,7 @@ def deployApp(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName){
             openshiftDeploy(namespace: projectName,deploymentConfig: msName)
+	    sh 'oc apply -f https://github.com/Vageesha17/projsvc/tree/master/Openshift -n=test'
         }
     }
 }
