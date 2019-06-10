@@ -85,11 +85,11 @@ def buildApp(projectName,msName){
 	          if(!bcExists){
 	    	        openshift.newBuild("https://github.com/manyatripathi/projsvc","--strategy=docker")
                 def rm = openshift.selector("dc", msName).rollout()
-                timeout(15) { 
+                /*timeout(15) { 
                   openshift.selector("dc", msName).related('pods').untilEach(1) {
                     return (it.object().status.phase == "Running")
                   }
-                }  
+                }  */
 	          }
             else {
                /* openshift.startBuild(msName,"--wait")  */
