@@ -25,7 +25,6 @@ def readProperties()
 def devDeployment(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName) {
-            openshiftDeploy(namespace: projectName,deploymentConfig: msName)
 	    sh 'oc apply -f https://github.com/Vageesha17/projsvc/tree/master/Openshift -n=test'
         } 
     }
