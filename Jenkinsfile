@@ -92,7 +92,8 @@ def buildApp(projectName,msName){
                 }  
 	          }
             else {
-                openshift.startBuild(msName,"--wait")  
+               /* openshift.startBuild(msName,"--wait")  */
+		    openshift.startBuild(msName)
             }    
         }
     }
