@@ -83,7 +83,7 @@ def buildApp(projectName,msName){
             def bcSelector = openshift.selector( "bc", msName)
             def bcExists = bcSelector.exists()
 	          if(!bcExists){
-	    	        openshift.newBuild("https://github.com/Vageesha17/projsvc","--strategy=docker")
+	    	        openshift.newBuild("https://github.com/manyatripathi/projsvc","--strategy=docker")
                 def rm = openshift.selector("dc", msName).rollout()
                 timeout(15) { 
                   openshift.selector("dc", msName).related('pods').untilEach(1) {
