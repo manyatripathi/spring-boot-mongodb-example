@@ -26,7 +26,7 @@ def devDeployment(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName) {
 	    sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/deployment.yaml -n=ms-dev'
-	    sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/service-monitor.yaml -n=ms-dev'
+	    /*sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/service-monitor.yaml -n=ms-dev'*/
             sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/service.yaml -n=ms-dev'
         } 
     }
