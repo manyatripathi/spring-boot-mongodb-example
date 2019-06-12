@@ -78,25 +78,22 @@ def prodDeployment(sourceProjectName,destinationProjectName,msName){
 }*/
 
 def buildApp(projectName,msName){
-    openshift.withCluster() {
-        openshift.withProject(projectName){
-            def bcSelector = openshift.selector( "bc", msName)
+openshift.withCluster() {
+        openshift.withProject(projectName) {
+            def bcSelector = openshift.selector( "bc", msName) 
             def bcExists = bcSelector.exists()
-	          if(!bcExists){
-	    	        openshift.newBuild("https://github.com/manyatripathi/projsvc","--strategy=docker")
-                def rm = openshift.selector("dc", msName).rollout()
-                /*timeout(15) { 
-                  openshift.selector("dc", msName).related('pods').untilEach(1) {
-                    return (it.object().status.phase == "Running")
-                  }
-                }  */
-	          }
-            else {
-               /* openshift.startBuild(msName,"--wait")  */
-		    openshift.startBuild(msName)
-            }    
+            if (!bcExists) {
+                openshift.newBuild("https://github.com/Vageesha17/projsvc","--strategy=docker")
+                sh 'sleep 400'               
+            } else {
+                sh 'echo build config already exists in development environment,starting existing build'  
+                openshift.startBuild(msName,"--wait")                
+            } 
+           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'dev-apps')
+           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test-apps')
+           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod-apps')
         }
-    }
+}
 }
 
 def deployApp(projectName,msName){
@@ -126,6 +123,12 @@ node
    {
        readProperties()
        checkout([$class: 'GitSCM', branches: [[name: "*/${BRANCH}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '${GIT_CREDENTIALS}', url: "${GIT_SOURCE_URL}"]]])
+       sh 'oc set image --local=true -f Orchestration/deployment.yaml ${MS_NAME}=docker-registry.default.svc:5000/$APP_NAME-dev-apps/${MS_NAME}:dev-apps --dry-run -o yaml >> Orchestration/deployment-dev.yaml'
+       sh 'oc set image --local=true -f Orchestration/deployment.yaml ${MS_NAME}=docker-registry.default.svc:5000/$APP_NAME-dev-apps/${MS_NAME}:test-apps --dry-run -o yaml >> Orchestration/deployment-test.yaml'
+       sh 'oc set image --local=true -f Orchestration/deployment.yaml ${MS_NAME}=docker-registry.default.svc:5000/$APP_NAME-dev-apps/${MS_NAME}:qa-apps --dry-run -o yaml >> Orchestration/deployment-qa.yaml'
+       sh 'oc set image --local=true -f Orchestration/deployment.yaml ${MS_NAME}=docker-registry.default.svc:5000/$APP_NAME-dev-apps/${MS_NAME}:pt-apps --dry-run -o yaml >> Orchestration/deployment-pt.yaml'   
+       sh 'oc set image --local=true -f Orchestration/deployment.yaml ${MS_NAME}=docker-registry.default.svc:5000/$APP_NAME-dev-apps/${MS_NAME}:uat-apps --dry-run -o yaml >> Orchestration/deployment-uat.yaml'	   
+       sh 'oc set image --local=true -f Orchestration/deployment.yaml ${MS_NAME}=docker-registry.default.svc:5000/$APP_NAME-dev-apps/${MS_NAME}:preprod-apps --dry-run -o yaml >> Orchestration/deployment-preprod.yaml'   
    }
 
    stage('Initial Setup')
@@ -165,24 +168,29 @@ node
 
    stage('Dev - Build Application')
    {
-       buildApp("${APP_NAME}-dev", "${MS_NAME}")
+       buildApp("${APP_NAME}-dev-apps", "${MS_NAME}")
    }
-
+   stage('Tagging Image for Dev')
+   {
+       openshiftTag(namespace: '$APP_NAME-dev-apps', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'dev-apps')
+   }
    stage('Dev - Deploy Application')
    {
-
-       devDeployment("${APP_NAME}-dev", "${MS_NAME}")
+       sh 'oc apply -f Orchestration/deployment-dev.yaml -n=${APP_NAME}-dev-apps'
+       sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-dev-apps'
+       
    }
 	
-  stage('Tagging Image for Testing')
+   stage('Tagging Image for Testing')
    {
-       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'test')
+       openshiftTag(namespace: '$APP_NAME-dev-apps', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'test-apps')
    }
    if(env.TESTING == 'True')
    {	
 	   stage('Test - Deploy Application')
 	   {
-		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-test", "${MS_NAME}","test")
+		   sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-test-apps'
+       		   sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-test-apps'
 	   }
 	     
 	   node('selenium')
@@ -203,7 +211,8 @@ if(env.QA == 'True')
    {	
 	   stage('Test - Deploy Application')
 	   {
-		   testDeployment("${APP_NAME}-dev", "${APP_NAME}-qa", "${MS_NAME}","test")
+		   sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-qa-apps'
+       		   sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-qa-apps'
 	   }
 	   node('selenium')
 	   {
@@ -219,14 +228,15 @@ if(env.QA == 'True')
     }
 stage('Tagging Image for PT')
    {
-       openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'test', destStream: '$MS_NAME', destTag: 'PT')
+       openshiftTag(namespace: '$APP_NAME-dev-apps', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'pt-apps')
    }
 if(env.PT == 'True')
    {	
 
 	stage('Test - Deploy Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-pt", "${MS_NAME}","PT")
+		sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-pt-apps'
+       		sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-pt-apps'
 	 }
 	     
 	stage('Performance Testing')
@@ -238,19 +248,21 @@ if(env.PT == 'True')
 
 	stage('Tagging Image for UAT')
    	{
-       		openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'PT', destStream: '$MS_NAME', destTag: 'UAT')
+       		openshiftTag(namespace: '$APP_NAME-dev-apps', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'uat-apps')
    	}
 	stage('Test - UAT Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-uat", "${MS_NAME}","UAT")
+		sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-uat-apps'
+       		sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-uat-apps'
 	 }
 	stage('Tagging Image for Pre-Prod')
    	{
-       		openshiftTag(namespace: '$APP_NAME-dev', srcStream: '$MS_NAME', srcTag: 'UAT', destStream: '$MS_NAME', destTag: 'PRE')
+       		openshiftTag(namespace: '$APP_NAME-dev-apps', srcStream: '$MS_NAME', srcTag: 'latest', destStream: '$MS_NAME', destTag: 'preprod-apps')
    	}
 	stage('Test - Preprod Application')
 	 {
-		testDeployment("${APP_NAME}-dev", "${APP_NAME}-preprod", "${MS_NAME}","PRE")
+		sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-preprod-apps'
+       		sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-preprod-apps'
 	 }
 	     
 	
