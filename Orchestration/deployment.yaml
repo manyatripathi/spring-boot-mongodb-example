@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projsvc
+annotations:
+ "sidecar.jaegertracing.io/inject": "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projsvc
+  template:
+    metadata:
+      labels:
+        app: projsvc
+    spec:
+      containers:
+      - name: projsvc
+        image: projsvc:latest
+        ports:
+        - name: web
+          containerPort: 8080
+        env: 
+        - name: JAEGER_SERVICE_NAME
+          value: jmx-exporter
+        - name: JAEGER_ENDPOINT
+          value: 'http://jaeger-collector.observability.svc:14268/api/traces'
+        - name: JAEGER_SAMPLER_TYPE
+          value: const
+        - name: JAEGER_SAMPLER_PARAM
+          value: '1'
+        - name: JAEGER_REPORTER_LOG_SPANS
+          value: 'true'
+        - name: JAEGER_TAGS
+          value: 'version=${VERSION}'
