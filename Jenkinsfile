@@ -22,60 +22,7 @@ def readProperties()
     
 }
 
-/*def devDeployment(projectName,msName){
-    openshift.withCluster() {
-        openshift.withProject(projectName) {
-	    sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/deployment.yaml -n=ms-dev'
-	    /*sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/service-monitor.yaml -n=ms-dev'*/
-            sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/service.yaml -n=ms-dev'
-        } 
-    }
-}*/
 
-def testDeployment(sourceProjectName,destinationProjectName,msName,tagName){
-    openshift.withCluster() {
-        openshift.withProject(destinationProjectName){
-	          def dcSelector = openshift.selector( "dc", msName)
-            def dcExists = dcSelector.exists()
-	          if(!dcExists){
-	    	      openshift.newApp(sourceProjectName+"/"+msName+":"+tagName)   
-	          }
-            else {
-                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName) 
-            } 
-        }
-    }
-}
-def prodDeployment(sourceProjectName,destinationProjectName,msName){
-    openshift.withCluster() {
-        openshift.withProject(destinationProjectName){
-	          def dcSelector = openshift.selector( "dc", msName)
-            def dcExists = dcSelector.exists()
-	          if(!dcExists){
-	    	        openshift.newApp(sourceProjectName+"/"+msName+":"+"prod")   
-	          }
-            else {
-                openshiftDeploy(namespace: destinationProjectName,deploymentConfig: msName)
-            } 
-        }
-    }
-}
-/*def DatabaseDeployment(projectName,msName){
-    openshift.withCluster() {
-        openshift.withProject(projectName) {
-            def bcSelector = openshift.selector( "bc", msName)
-            def bcExists = bcSelector.exists()
-            if (!bcExists) {
-                openshift.newApp("-e MYSQL_USER=admin","-e MYSQL_PASSWORD=admin","-e MYSQL_DATABASE=admin","registry.access.redhat.com/rhscl/mysql-56-rhel7")
-                sh 'sleep 120'
-                openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test')
-                openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'prod')
-            } else {
-                sh 'mvn flyway:migrate'  
-            } 
-        }
-    }
-}*/
 
 def buildApp(projectName,msName){
 openshift.withCluster() {
@@ -96,14 +43,6 @@ openshift.withCluster() {
 }
 }
 
-def deployApp(projectName,msName){
-    openshift.withCluster() {
-        openshift.withProject(projectName){
-            openshiftDeploy(namespace: projectName,deploymentConfig: msName)
-	    
-        }
-    }
-}
 
 podTemplate(cloud:'openshift',label: 'selenium', 
   containers: [
