@@ -35,13 +35,7 @@ openshift.withCluster() {
             } else {
                 sh 'echo build config already exists in development environment,starting existing build'  
                 openshift.startBuild(msName,"--wait")                
-            } 
-           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'dev-apps')
-           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'test-apps')
-           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'qa-apps')
-	   openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'pt-apps')
-           openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'uat-apps')
-	   openshiftTag(namespace: projectName, srcStream: msName, srcTag: 'latest', destStream: msName, destTag: 'preprod-apps')
+            }
         }
 }
 }
