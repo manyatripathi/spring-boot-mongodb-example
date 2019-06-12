@@ -22,7 +22,7 @@ def readProperties()
     
 }
 
-def devDeployment(projectName,msName){
+/*def devDeployment(projectName,msName){
     openshift.withCluster() {
         openshift.withProject(projectName) {
 	    sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/deployment.yaml -n=ms-dev'
@@ -30,7 +30,7 @@ def devDeployment(projectName,msName){
             sh 'oc apply -f https://raw.githubusercontent.com/manyatripathi/projsvc/master/Orchestration/service.yaml -n=ms-dev'
         } 
     }
-}
+}*/
 
 def testDeployment(sourceProjectName,destinationProjectName,msName,tagName){
     openshift.withCluster() {
