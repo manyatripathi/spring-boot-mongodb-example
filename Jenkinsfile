@@ -150,7 +150,7 @@ if(env.QA == 'True')
    {	
 	   stage('Test - Deploy Application')
 	   {
-		   sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-qa-apps'
+		   sh 'oc apply -f Orchestration/deployment-qa.yaml -n=${APP_NAME}-qa-apps'
        		   sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-qa-apps'
 	   }
 	   node('selenium')
@@ -174,7 +174,7 @@ if(env.PT == 'True')
 
 	stage('Test - Deploy Application')
 	 {
-		sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-pt-apps'
+		sh 'oc apply -f Orchestration/deployment-pt.yaml -n=${APP_NAME}-pt-apps'
        		sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-pt-apps'
 	 }
 	     
@@ -191,7 +191,7 @@ if(env.PT == 'True')
    	}
 	stage('Test - UAT Application')
 	 {
-		sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-uat-apps'
+		sh 'oc apply -f Orchestration/deployment-uat.yaml -n=${APP_NAME}-uat-apps'
        		sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-uat-apps'
 	 }
 	stage('Tagging Image for Pre-Prod')
@@ -200,7 +200,7 @@ if(env.PT == 'True')
    	}
 	stage('Test - Preprod Application')
 	 {
-		sh 'oc apply -f Orchestration/deployment-test.yaml -n=${APP_NAME}-preprod-apps'
+		sh 'oc apply -f Orchestration/deployment-preprod.yaml -n=${APP_NAME}-preprod-apps'
        		sh 'oc apply -f Orchestration/service.yaml -n=${APP_NAME}-preprod-apps'
 	 }
 	     
