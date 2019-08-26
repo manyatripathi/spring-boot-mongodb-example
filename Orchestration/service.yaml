@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: projsvc
+  labels:
+    app: projsvc
+    team: backend
+spec:
+  selector:
+    app: projsvc
+  ports:
+  - name: web
+    port: 8080
+  - port: 8089
+    name: prom

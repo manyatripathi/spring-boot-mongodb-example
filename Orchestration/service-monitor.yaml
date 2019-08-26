@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: projsvc
+  name: projsvc
+  namespace: openshift-monitoring
+spec:
+  endpoints:
+    - interval: 30s
+      port: prom
+  namespaceSelector:
+    matchNames:
+    - testjenkin-dev-apps
+    - testjenkin-test-apps
+  selector:
+    matchLabels:
+      app: projsvc
